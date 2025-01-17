@@ -2,101 +2,118 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\StudentResource\Pages\CreateStudent;
+use App\Filament\Resources\StudentResource\Pages\EditStudent;
+use App\Filament\Resources\StudentResource\Pages\ListStudents;
 use App\Models\Advisor;
+use App\Models\Course;
 use App\Models\Student;
-use Filament\Http\Middleware\Authenticate;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class StudentTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected Advisor $advisor;
+    protected Course|Collection $courses;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->withoutMiddleware(Authenticate::class);
+        $admin = User::factory()->create(['is_admin' => true]);
+        $this->actingAs($admin);
 
-        Advisor::factory()->create();
+        $this->advisor = Advisor::factory()->create();
+        $this->courses = Course::factory()->count(3)->create();
     }
 
-    public function test_example(): void
+    public function testCanCreateAStudentViaFilament(): void
     {
-        $response = $this->get('/');
+        Livewire::test(CreateStudent::class)
+            ->set('data.name', 'John Doe')
+            ->set('data.email', 'johndoe@example.com')
+            ->set('data.bio', 'A sample bio')
+            ->set('data.date_of_birth', '2000-01-01')
+            ->set('data.advisor_id', $this->advisor->id)
+            ->set('data.courses', $this->courses->pluck('id')->toArray())
+            ->call('create')
+            ->assertHasNoErrors();
 
-        $response->assertStatus(200);
-    }
-
-    public function a_student_can_be_created_via_filament()
-    {
-        $response = $this->post(route('filament.admin.resources.students.create'), [
+        $this->assertDatabaseHas('students', [
             'name' => 'John Doe',
             'email' => 'johndoe@example.com',
-            'bio' => 'A sample bio',
-            'date_of_birth' => '2000-01-01',
+        ]);
+    }
+
+    public function testStudentsCanBeListed()
+    {
+
+        $student = Student::factory()->create([
+            'advisor_id' => $this->advisor->id,
         ]);
 
-        $response->assertStatus(302);
-        $this->assertDatabaseHas('students', ['email' => 'johndoe@example.com']);
+        $student->courses()->attach($this->courses->pluck('id')->toArray());
+
+        Livewire::test(ListStudents::class)
+            ->assertSee($student->name)
+            ->assertSee($student->email)
+            ->assertSee($this->advisor->name);
     }
 
     /** @test */
-    public function students_can_be_listed_via_filament()
+    public function testStudentCanBeUpdated()
     {
-        $student = Student::factory()->create();
+        $student = Student::factory()->create([
+            'name' => 'Original Name',
+            'email' => 'original@example.com',
+            'advisor_id' => $this->advisor->id,
+        ]);
 
-        $response = $this->get(route('filament.admin.resources.students.index'));
+        $student->courses()->attach($this->courses->pluck('id')->toArray());
 
-        $response->assertStatus(200);
-        $response->assertSee($student->name);
-    }
-
-    /** @test */
-    public function a_student_can_be_updated()
-    {
-        $student = Student::factory()->create();
-
-
-        // Simulate form submission
-        $this->actingAs($this->userWithPermission())
-            ->editResource(Student::class, $student->id)
-            ->fill([
-                'name' => 'Jane Doe',
-                'email' => 'janedoe@example.com',
-                'bio' => 'Updated bio content',
-                'date_of_birth' => '2000-01-01',
-            ])
+        Livewire::test(EditStudent::class, ['record' => $student->id])
+            ->set('data.name', 'Updated Name')
+            ->set('data.email', 'updated@example.com')
+            ->set('data.courses', $this->courses->pluck('id')->toArray())
             ->call('save')
-            ->assertRedirect('/admin/students');
+            ->assertHasNoErrors();
 
-        // Assert the database has the updated data
         $this->assertDatabaseHas('students', [
             'id' => $student->id,
-            'name' => 'Jane Doe',
-            'email' => 'janedoe@example.com',
+            'name' => 'Updated Name',
+            'email' => 'updated@example.com',
         ]);
     }
 
     /** @test */
-    public function a_student_can_be_deleted_via_filament()
+    public function testStudentCanBeDeleted()
     {
-        $student = Student::factory()->create();
-
-        $response = $this->delete(route('filament.admin.resources.students.destroy', $student->id));
-
-        $response->assertStatus(302); // Filament redirects after deletion
-        $this->assertDatabaseMissing('students', ['id' => $student->id]);
-    }
-
-    /** @test */
-    public function validation_checks_for_student_creation()
-    {
-        $response = $this->post(route('students.store'), [
-            'name' => '',
-            'email' => '',
+        $student = Student::factory()->create([
+            'advisor_id' => $this->advisor->id,
         ]);
 
-        $response->assertSessionHasErrors(['name', 'email']);
+        $student->courses()->attach($this->courses->pluck('id')->toArray());
+
+        Livewire::test(ListStudents::class)
+            ->callTableAction('delete', $student)
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseMissing('students', [
+            'id' => $student->id,
+        ]);
+    }
+
+    public function testValidationChecksForStudentCreation()
+    {
+        Livewire::test(CreateStudent::class)
+            ->set('data.name', '')
+            ->set('data.email', '')
+            ->call('create')
+            ->assertHasErrors(['data.name', 'data.email']);
     }
 }
