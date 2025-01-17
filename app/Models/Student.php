@@ -83,4 +83,8 @@ class Student extends Model implements HasMedia
         });
     }
 
+    public function getProfilePhotoUrlAttribute(): string
+    {
+        return $this->getFirstMediaUrl('profile_photos');
+    }
 }

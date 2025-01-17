@@ -19,9 +19,21 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 
-    <Directory /var/www/html/storage>
+    <Directory /var/www/app/storage>
         Options Indexes FollowSymLinks
         AllowOverride All
         Require all granted
     </Directory>
+
+    <IfModule mod_rewrite.c>
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^(.*)$ index.php [L]
+    </IfModule>
+
+    # Allow access to storage
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg)$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
 </IfModule>
