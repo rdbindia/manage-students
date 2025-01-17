@@ -53,9 +53,7 @@ class Student extends Model implements HasMedia
     protected static function booted(): void
     {
         static::saved(function ($student) {
-            // Check if Livewire has a file reference
             if (is_array($student->profile_photo)) {
-                // Extract the file reference
                 $livewireFile = collect($student->profile_photo)
                     ->keys()
                     ->first();
