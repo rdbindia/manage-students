@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->text('bio');
             $table->date('date_of_birth');
+            $table->unsignedBigInteger('advisor_id')->nullable();
             $table->foreignId('advisor_id')->constrained('advisors')->onDelete('cascade');
             $table->timestamps();
         });
