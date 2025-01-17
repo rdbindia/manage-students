@@ -12,6 +12,8 @@ services:
     volumes:
       - ./dockerize_laravel/nginx/default.conf:/etc/nginx/conf.d/default.conf
       - .:/var/www/app:delegated
+      - ./nginx:/etc/nginx/conf.d
+      - ./public:/var/www/html
     depends_on:
       - manage_students
     networks:
@@ -30,22 +32,6 @@ services:
       - .:/var/www/app:delegated
     networks:
       - laravel
-
-#  vue:
-#    build:
-#      context: ./frontend
-#      dockerfile: Dockerfile
-#    container_name: vue
-#    ports:
-#      - '5173:5173'
-#    volumes:
-#      - ./frontend:/app
-#      - /app/node_modules
-#    environment:
-#      - VITE_API_BASE_URL=https://localhost:7001//api
-#      - NODE_ENV=development
-#    networks:
-#      - laravel
 
   database:
     image: mysql:latest
