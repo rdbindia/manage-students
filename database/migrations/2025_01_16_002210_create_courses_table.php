@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->unsignedBigInteger('advisor_id')->nullable();
             $table->foreignId('advisor_id')->constrained('advisors')->onDelete('cascade');
             $table->timestamps();
         });
