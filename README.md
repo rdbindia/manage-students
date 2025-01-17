@@ -49,7 +49,7 @@ The Manage Students Application is a Laravel-based project designed to manage st
 APP_NAME=ManageStudents
 APP_URL=http://localhost:7001
 DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
+DB_HOST=database
 DB_PORT=3306
 DB_DATABASE=manage_students
 DB_USERNAME=root
@@ -67,17 +67,31 @@ make seed
 
 Create the symbolic link for public storage:
 
-php artisan storage:link
+`php artisan storage:link`
 
 6. Start Docker 
 
 If using Docker:
 
-docker-compose up -d (for first time setup use --build)
+`docker-compose up -d` (for first time setup use --build)
 
 7. Run the Development Server
 
 Run `make createuser`
+
+- Add AdminPanelProvider
+![img.png](img.png)
+
+- Add a User's name here
+![img_1.png](img_1.png)
+- Add a user email address
+![img_2.png](img_2.png)
+- Add a password
+
+![img_3.png](img_3.png)
+* Success! 
+![img_4.png](img_4.png)
+
 
 ```
 Admin Panel Access
@@ -90,7 +104,13 @@ Password: password
 ```
 
 Visit the Filament admin panel at:
+
 http://localhost:7001/admin
+
+## To access Frontend
+- You can check the list of students using the link 
+
+http://localhost:7001/students
 
 ## Testing
 
