@@ -1,53 +1,51 @@
-Manage Students Application
+# Manage Students Application
 
-Overview
+## Overview
 
 The Manage Students Application is a Laravel-based project designed to manage students, courses, and advisors with an admin interface powered by Filament. It supports CRUD operations, media uploads, and role-based authentication.
 
-Features
+## Features
 
-Student Management: Add, edit, delete, and view student records.
+- Student Management: Add, edit, delete, and view student records.
 
-Course Management: Manage courses and associate them with students and advisors.
+- Course Management: Manage courses and associate them with students and advisors.
 
-Advisor Management: Manage advisors and their relationships with students and courses.
+- Advisor Management: Manage advisors and their relationships with students and courses.
 
-Media Uploads: Upload and display profile photos for students using Spatie Media Library.
+- Media Uploads: Upload and display profile photos for students using Spatie Media Library.
 
-Admin Panel: Filament-based admin panel for managing all resources.
+- Admin Panel: Filament-based admin panel for managing all resources.
 
-Prerequisites
+## Prerequisites
 
-PHP >= 8.1
+- PHP >= 8.1
 
-Composer
+- Composer
 
-Node.js & npm
+- Docker & Docker Compose (for containerized development)
 
-Docker & Docker Compose (for containerized development)
+- MySQL
 
-MySQL
-
-Installation
+## Installation
 
 1. Clone the Repository
 
-git clone https://github.com/rdbindia/manage-students.git
-cd manage-students
+- git clone https://github.com/rdbindia/manage-students.git
+- cd manage-students
 
 2. Install Dependencies
 
-composer install
-npm install && npm run dev
+- composer install
 
 3. Set Up Environment Variables
 
-Copy the .env.example file to .env:
+- Copy the .env.example file to .env:
 
-cp .env.example .env
+- cp .env.example .env
 
-Update the .env file with your database and application settings:
+- Update the .env file with your database and application settings:
 
+```
 APP_NAME=ManageStudents
 APP_URL=http://localhost:7001
 DB_CONNECTION=mysql
@@ -56,10 +54,14 @@ DB_PORT=3306
 DB_DATABASE=manage_students
 DB_USERNAME=root
 DB_PASSWORD=yourpassword
+```
 
 4. Set Up the Database
 
+``` 
+make migrate 
 make seed
+```
 
 5. Set Up Storage
 
@@ -67,16 +69,17 @@ Create the symbolic link for public storage:
 
 php artisan storage:link
 
-6. Start Docker (Optional)
+6. Start Docker 
 
 If using Docker:
 
-docker-compose up -d
+docker-compose up -d (for first time setup use --build)
 
 7. Run the Development Server
 
-Run make createuser
+Run `make createuser`
 
+```
 Admin Panel Access
 
 Seeded Admin User:
@@ -84,15 +87,16 @@ Seeded Admin User:
 Email: admin@example.com
 
 Password: password
+```
 
 Visit the Filament admin panel at:
 http://localhost:7001/admin
 
-Testing
+## Testing
 
-Run tests using:
+- Run tests using:
 
-php artisan test
+`php artisan test`
 
 
 
